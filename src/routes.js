@@ -20,6 +20,7 @@ app.use((req, res, next) => {
 });
 
 routes.get("/", (req, res) => {
+    console.log(process.env.DATABASE_URL)
     return res.json({ msg: "App Eventos" });
 });
 
