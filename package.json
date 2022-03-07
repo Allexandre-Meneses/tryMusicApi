@@ -1,0 +1,36 @@
+{
+    "name": "engsw-tp-grupo-d",
+    "version": "1.0.0",
+    "main": "server.js",
+    "repository": "git@github.com:les-prp-uespi/engsw-tp-grupo-d.git",
+    "author": "Ronnildo <ronildosp03@gmail.com>",
+    "license": "MIT",
+    "engines": {
+        "node": "16.14.0",
+        "yarn": "1.22.17"
+    },
+    "scripts": {
+        "dev": "nodemon src/server.js",
+        "start": "node src/server.js"
+    },
+    "dependencies": {
+        "axios": "^0.26.0",
+        "bcrypt": "^5.0.1",
+        "bcryptjs": "^2.4.3",
+        "cors": "^2.8.5",
+        "dotenv": "^16.0.0",
+        "express": "^4.17.2",
+        "ioredis": "^4.28.2",
+        "jsonwebtoken": "^8.5.1",
+        "mysql2": "^2.3.3",
+        "pg": "^8.7.1",
+        "pg-hstore": "^2.3.4",
+        "sequelize": "^6.17.0",
+        "sucrase": "^3.20.3",
+        "yup": "^0.32.11"
+    },
+    "devDependencies": {
+        "nodemon": "^2.0.15",
+        "sequelize-cli": "^6.3.0"
+    }
+}
