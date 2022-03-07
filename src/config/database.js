@@ -1,16 +1,25 @@
-require('dotenv').config();
+//require('dotenv').config();
 
-const { DATABASE_USERNAME, DATABASE_PASSWORD, DATABASE_HOST } = process.env;
+/*const { DATABASE_USERNAME, DATABASE_PASSWORD, DATABASE_HOST, DATABASE_NAME } = process.env;*/
 
 module.exports = {
-    username: "jlagjhpyivivwp",
-    password: "405f960cb22e7c004111c40a1f9afccd1bded71c4a629dae0fbb3dbaebf6e857",
-    database: "d8m4per4tl7i5j",
-    host: "ec2-54-156-110-139.compute-1.amazonaws.com",
+    url: process.env.DATABASE_URL,
+    /*
+    username: "clyndfamjairur",
+    password: "9b821729d322549a8ca9b94d0a73d53e55f46b483eb8145f1e0e560f2b6f9e14",
+    database:"d95j57ithefmop",
+    host: "ec2-34-231-183-74.compute-1.amazonaws.com",
+    */
     dialect: "postgres",
+    dialectOptions: {
+        ssl: {
+            rejectUnauthorized: false,
+        }
+    },
     define: {
         timestamps: true,
         underscored: true,
         undescoredAll: true,
     },
 }
+
