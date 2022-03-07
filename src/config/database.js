@@ -2,7 +2,7 @@
 
 /*const { DATABASE_USERNAME, DATABASE_PASSWORD, DATABASE_HOST, DATABASE_NAME } = process.env;*/
 
-module.exports = {,
+module.exports = {
     username: "postgres",
     password: "123456",
     database:"tryMusic",
