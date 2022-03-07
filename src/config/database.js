@@ -2,14 +2,11 @@
 
 /*const { DATABASE_USERNAME, DATABASE_PASSWORD, DATABASE_HOST, DATABASE_NAME } = process.env;*/
 
-module.exports = {
-    url: "postgres://clyndfamjairur:9b821729d322549a8ca9b94d0a73d53e55f46b483eb8145f1e0e560f2b6f9e14@ec2-34-231-183-74.compute-1.amazonaws.com:5432/d95j57ithefmop",
-    /*
-    username: "clyndfamjairur",
-    password: "9b821729d322549a8ca9b94d0a73d53e55f46b483eb8145f1e0e560f2b6f9e14",
-    database:"d95j57ithefmop",
-    host: "ec2-34-231-183-74.compute-1.amazonaws.com",
-    */
+module.exports = {,
+    username: "postgres",
+    password: "123456",
+    database:"tryMusic",
+    host: "172.17.0.3",
     dialect: "postgres",
     dialectOptions: {
         ssl: {
