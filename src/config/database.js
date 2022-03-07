@@ -3,10 +3,11 @@ require('dotenv').config();
 /*const { DATABASE_USERNAME, DATABASE_PASSWORD, DATABASE_HOST, DATABASE_NAME } = process.env;*/
 
 module.exports = {
-    url: process.env.DATABASE_URL,
-    /*password: "123456",
-    database:"tryMusic",
-    host: "172.17.0.3",*/
+    //url: process.env.DATABASE_URL,
+    username: process.env.DATABASE_USERNAME,
+    password: process.env.DATABASE_PASSWORD,
+    database:process.env.DATABASE_NAME,
+    host: process.env.DATABASE_HOST,
     dialect: "postgres",
     dialectOptions: {
         ssl: {
