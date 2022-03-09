@@ -21,6 +21,7 @@ class BandaController {
                 attributes: ["name", "date", "time", "place", "description", "tipo"]
             }]*/
         });
+
         //console.log(events)
         return res.json(bandas);
     }
@@ -105,6 +106,15 @@ class BandaController {
         })
 
         return res.status(200).json({ msg: "Ingressou na Banda"})
+    }
+
+    async delete(req, res) {
+
+        const banda = await Band.findByPk(req.body.id)
+
+        banda.destroy()
+
+        return res.json({ mensagem: "Banda excluido" });
     }
 }
 

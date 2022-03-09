@@ -33,6 +33,7 @@ routes.get('/users', cors(), UserController.index);
 /*Routes de Bands*/
 
 routes.put('/bands', bandController.update);
+routes.delete('/bands', bandController.delete)
 
 /* Routes de Events*/
 
