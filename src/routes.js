@@ -68,7 +68,7 @@ routes.put('/bands', bandController.update);
 routes.delete('/bands', bandController.delete);
 
 /*Routes de Events*/
-[
+
 
 
 module.exports = routes;
