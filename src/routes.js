@@ -21,6 +21,7 @@ app.use((req, res, next) => {
 });
 
 routes.get("/", (req, res) => {
+    console.log(process.env.DATABASE_URLus)
     return res.json({ msg: "App Eventos" });
 });
 
@@ -68,6 +69,8 @@ routes.put('/bands', bandController.update);
 routes.delete('/bands', bandController.delete);
 
 /*Routes de Events*/
+
+
 
 
 
