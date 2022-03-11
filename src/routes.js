@@ -40,6 +40,7 @@ routes.delete('/bands', bandController.delete)
 
 /* Routes de Events*/
 
+routes.post('/events', cors(), EventsController.store);
 routes.post('/eventsget', cors(), EventsController.index);
 routes.put('/events/:event_id', cors(), EventsController.update);
 routes.delete('/events', cors(), EventsController.delete);
@@ -68,9 +69,7 @@ routes.put('/bands', bandController.update);
 routes.delete('/bands', bandController.delete);
 
 /*Routes de Events*/
-
-routes.post('/events', cors(), EventsController.store);
-
+[
 
 
 module.exports = routes;
