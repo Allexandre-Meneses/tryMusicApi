@@ -1,4 +1,5 @@
 const { Model, Sequelize } = require("sequelize");
+const Bands = require("../models/Bands");
 
 class Events extends Model {
     static init(sequelize) {
@@ -14,6 +15,10 @@ class Events extends Model {
             sequelize,
         });
         return this;
+    }
+    static associate(models) {
+        this.hasMany(models.Bands);
+        Bands.belongsTo(models.Events, {foreignKey: "event_id", as: "band"});
     }
 }
 

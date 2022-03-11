@@ -7,6 +7,7 @@ const AuthMiddleware = require('./app/middlewares/auth');
 const SessionController = require("./app/controllers/SessionController");
 const UserController = require("./app/controllers/userController");
 const bandController = require("./app/controllers/bandController");
+const userController = require("./app/controllers/userController");
 
 const routes = new Router();
 
@@ -32,19 +33,22 @@ routes.get('/users', cors(), UserController.index);
 
 /*Routes de Bands*/
 
+routes.post('/band', bandController.getBand)
 routes.put('/bands', bandController.update);
 routes.delete('/bands', bandController.delete)
 
+
 /* Routes de Events*/
 
-routes.post('/events', cors(), EventsController.store);
-routes.get('/events', cors(), EventsController.index);
-routes.put('/events/:id', cors(), EventsController.update);
+routes.post('/eventsget', cors(), EventsController.index);
+routes.put('/events/:event_id', cors(), EventsController.update);
 routes.delete('/events', cors(), EventsController.delete);
 
 /*Routes de Session*/
 
 routes.post("/login", cors(), SessionController.store);
+
+routes.post('/bands/:band_id/users', userController.joinBand);
 
 //Todas as rotas após o middlwares só serão executadas se o ususario estiver logado
 routes.use(AuthMiddleware);
@@ -56,12 +60,16 @@ routes.delete('/users', UserController.delete);
 
 /*Routes de Bands*/
 
-routes.post('/bands/:banda_id/users', UserController.store);
-routes.post('/bands', bandController.store);
+//routes.post('/bands/:event_id', bandController.store);
+routes.post('/bands',bandController.store);
 routes.get('/bands', bandController.index);
 routes.post('/join', bandController.joinBand)
+routes.put('/bands', bandController.update);
+routes.delete('/bands', bandController.delete);
 
 /*Routes de Events*/
+
+routes.post('/events', cors(), EventsController.store);
 
 
 

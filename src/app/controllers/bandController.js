@@ -1,121 +1,129 @@
 const express = require("express");
 const { password } = require("../../config/database");
 const Yup = require("yup");
-const Band = require('../models/Bands');
-const User = require('../models/Users');
+const Bands = require("../models/Bands");
+const User = require("../models/Users");
 const Events = require("../models/Events");
-
+const BandUser = require("../models/bandsusers");
+const BandsUser = require("../models/bandsusers");
+const { response } = require("express");
 
 const app = express();
 app.use(express.json());
 
 class BandaController {
+  async index(req, res) {
+    //console.log(bandasPertence)
+    const bandasPertence = await BandUser.findAll({ 
+      attributes: [],
+      where: { user_id : req.musicoId },
+      include: [{
+        model: Bands,
+          attributes: ['name', 'id']
+      }]
+    });
+    //console.log(events)
+    return res.json(bandasPertence);
+  }
 
-    async index(req, res) {
-        const user_id = req.musicoId
-        const bandas = await Band.findAll({where: {user_id},
-            attributes: ["id", "name",],
-            /*include: [{
-                model: Events,
-                as: "evento",
-                attributes: ["name", "date", "time", "place", "description", "tipo"]
-            }]*/
-        });
+  async getBand(req, res) {
+    const banda = await Bands.findByPk(req.body.id)
 
-        //console.log(events)
-        return res.json(bandas);
+    return res.json(banda)
+  }
+
+  async store(req, res) {
+    const esquema = Yup.object().shape({
+      name: Yup.string().required(),
+    });
+    const { name } = req.body;
+
+    if (!(await esquema.isValid(req.body))) {
+      return res.status(400).json({ mensagem: "invalid fields" });
     }
 
-    async store(req, res) {
-        const esquema = Yup.object().shape({
-            name: Yup.string().required(),
-            //musico_id: Yup.number().required(),
-            //evento_id: Yup.number().required()
-        });
-        const { name } = req.body;
-        const user_id = Number(req.musicoId);
-        console.log("Aquiii ESTAA OOO");
-        console.log(req.musicoId)
+    const user_id = Number(req.musicoId)
+    console.log(user_id)
+  
+    const { id } = await Bands.create({
+      name: name,
+      user_id: user_id
+    });
 
-        if (!(await esquema.isValid(req.body))) {
-            return res.status(400).json({ msg: "Campos Inválidos" });
-        }
-       /* const { musico_id, evento_id } = req.params;
+    await BandUser.create({
+      band_id: id,
+      user_id: user_id
+    });
+    return res.status(200).json({ mensagem: "Band successfully registered!" });
+  }
 
-        const user = await User.findByPk(musico_id);
-        const evento = await Events.findByPk(evento_id);
-
-        if (!user) {
-            return res.status(401).json({ msg: "Id não é um músico" });
-        }
-
-        if (!evento) {
-            return res.status(401).json({ msg: "Id não é um evento" });
-        }*/
-
-        const {id} = await Band.create({
-            name: name,
-            user_id: user_id
-        });
-
-        const user = await User.findOne({where: {id: user_id}})
-
-        const {band_id} = await user.update({
-            band_id: id
-        })
-
-
-        return res.status(200).json({ Msg: "Band Cadastrada com sucesso!" });
+  async update(req, res) {
+    const schema = Yup.object().shape({
+      name: Yup.string(),
+      novoName: Yup.string(),
+    });
+    if (!(await schema.isValid(req.body))) {
+      return res.status(400).json({ mensagem: "invalid fields" });
     }
 
-    async update(req, res) {
+    const { novoName } = req.body;
 
-        const schema = Yup.object().shape({
-            name: Yup.string(),
-            novoName: Yup.string(),
-        });
-        if (!(await schema.isValid(req.body))) {
-            return res.status(400).json({ msg: "Campos inválidos" });
-        }
+    const banda = await Bands.findOne({ where: { name: req.body.name } });
 
-        const { novoName } = req.body;
+    const { name } = await banda.update({
+      name: novoName,
+    });
 
-        const banda = await Band.findOne({ where: { name: req.body.name } });
+    return res.status(200).json({ mensagem: "Updated data!" });
+  }
+  async joinBand(req, res) {
+    const schema = Yup.object().shape({
+      band_id: Yup.string(),
+    });
+    if (!(await schema.isValid(req.body))) {
+      return res.status(400).json({ mensagem: "invalid fields" });
+    }
+    const { band_id } = req.body;
 
-        const { name } = await banda.update({
-            name: novoName,
-        })
+    const user = await User.findOne({ where: { id: req.musicoId } });
 
-        return res.status(200).json({ Msg: "Dados atualizados!" });
+    const jaRelac = await BandsUser.findAll({
+      where: {
+        band_id: band_id,
+        user_id: req.musicoId
+      }
+    })
 
+    console.log(jaRelac.length == 0)
+
+    if(jaRelac.length != 0){
+      return res.status(401).json({mensagem: "are you already in this band"})
     }
 
-    async joinBand(req, res) {
-        const schema = Yup.object().shape({
-        });
-        if (!(await schema.isValid(req.body))) {
-            return res.status(400).json({ msg: "Campos inválidos" });
-        }
-
-        const {band_id} = req.body;
-
-        const user = await User.findOne({where: {id: req.musicoId}})
-
-        const { name } = await user.update({
-            band_id: band_id
-        })
-
-        return res.status(200).json({ msg: "Ingressou na Banda"})
+    const bandExist = await Bands.findOne({where: {id: band_id}})
+    if(!bandExist){
+      return res.status(401).json({mensagem: "This Code is not associated with any band"})
     }
 
-    async delete(req, res) {
+    const { name } = await user.update({
+      band_id: band_id,
+    });
 
-        const banda = await Band.findByPk(req.body.id)
+    await BandUser.create({
+      band_id: band_id,
+      user_id: req.musicoId
+    });
 
-        banda.destroy()
+    return res.status(200).json({ mensagem: "Joined the Band" });
+  }
 
-        return res.json({ mensagem: "Banda excluido" });
-    }
+  async delete(req, res) {
+    const banda = await Bands.findByPk(req.body.id);
+
+    banda.destroy();
+
+    return res.json({ mensagem: "Band excluded!" });
+  }
 }
 
 module.exports = new BandaController();

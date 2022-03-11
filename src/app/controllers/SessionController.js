@@ -1,6 +1,7 @@
 const User = require("../models/Users");
 const jwt = require('jsonwebtoken')
 const Yup = require("yup");
+const config = require('../../config/auth');
 
 class SessionControler {
 
@@ -15,26 +16,26 @@ class SessionControler {
         }
 
         const { email, password } = req.body
-        const musico = await User.findOne({ where: { email } });
+        const user = await User.findOne({ where: { email } });
 
-        if (!musico) {
+        if (!user) {
             return res.status(401).json({ error: "Usuario não Cadastrado" });
         }
 
-        if (!(await musico.checkPassword(password))) {
+        if (!(await user.checkPassword(password))) {
             return res.status(401).json({ error: "Password Incorreto!" });
         }
 
 
-        const { id, name } = musico;
+        const { id, name } = user;
 
         return res.json({
-            musico: {
+            user: {
                 name,
                 email
             },
-            token: jwt.sign({ id, name }, "textounico", {
-                expiresIn: '1d'
+            token: jwt.sign({ id, name }, config.secret, {
+                expiresIn: config.dataLimite
             })
         })
     }

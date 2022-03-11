@@ -1,26 +1,18 @@
 const express = require("express");
 const Yup = require("yup");
 const { password } = require("../../config/database");
-const Band = require("../models/Bands");
+const Bands = require("../models/Bands");
 const User = require("../models/Users");
 const app = express();
 app.use(express.json());
 
-class MusicoController {
+class UserController {
   async index(req, res) {
     const user = await User.findAll({
       attributes: ["name", "password_hash"],
-      /*include: [
-        {
-          model: Band,
-          as: "banda",
-          attributes: ["name"],
-        },
-      ],*/
     });
-    return res.json(user);
+    return res.status(200).json(user);
   }
-
   //Função para adicionar um Músico
   async store(req, res) {
     // esquema quer dizer esquema do bando de dados
@@ -31,7 +23,7 @@ class MusicoController {
     });
 
     if (!(await schema.isValid(req.body))) {
-      return res.status(400).json({ msg: "Campos Inválidos" });
+      return res.status(400).json({ mensagem: "invalid fields" });
     }
 
     const userExist = await User.findOne({ where: { email: req.body.email } });
@@ -39,62 +31,52 @@ class MusicoController {
     if (userExist) {
       return res
         .status(400)
-        .json({ mensagem: "Já existe uma conta associada a este email!" });
+        .json({ mensagem: "There is already an account associated with this email!" });
     }
-    const { name, email, password_hash } = req.body;
-    /*const { banda_id } = req.params;
+    const { name, email, password_hash, band_id } = req.body;
 
-
-        if (!banda_id) {
-            res.json({ Msg: "Id não informado" });
-        }*/
-    //banda_id: banda_id
-    const musico = await User.create({
+    const user = await User.create({
       name: name,
       email: email,
       password_hash: password_hash,
+      band_id,
     });
 
-    return res.status(200).json({ Msg: "Usuário cadastrado!" });
+    return res.status(200).json({ name, email, password_hash, band_id });
   }
 
   async update(req, res) {
     const esquema = Yup.object().shape({
-      novoName: Yup.string(),
+      name: Yup.string(),
       email: Yup.string().email(),
       passwordAntigo: Yup.string().min(6),
-      passwordNovo: Yup.string()
+      password_hash: Yup.string()
         .min(6)
         .when("passwordAntigo", (passwordAntigo, field) =>
           passwordAntigo ? field.required() : field
         ), //validação condicional
       confirmarPassword: Yup.string().when(
         "passwordNovo",
-        (passwordNovo, field) =>
-          passwordNovo
-            ? field.required().oneOf([Yup.ref("passwordNovo")])
+        (password_hash, field) =>
+          password_hash
+            ? field.required().oneOf([Yup.ref("password_hash")])
             : field
       ), //validar o novo password
     });
 
     if (!(await esquema.isValid(req.body))) {
-      return res.status(400).json({ mensagem: "Campos invalidos" });
+      return res.status(400).json({ mensagem: "invalid fields" });
     }
 
-    const { novoName, passwordNovo } = req.body;
+    const user = await User.findOne({where: {name: req.body.name }});
 
-    const musico = await User.findByPk(req.musicoId);
-
-    if (!musico) {
-      return res.status(404).json({ mensagem: "User não cadastrado" });
+    if (!user) {
+      return res.status(404).json({ mensagem: "User not registered" });
     }
 
-    const { id, name, email } = await musico.update({
-      name: novoName,
-      password_hash: passwordNovo,
-    });
+    await user.update(req.body);
 
-    return res.json({ id, name, email });
+    return res.status(200).json({ user });
   }
 
   async delete(req, res) {
@@ -103,24 +85,54 @@ class MusicoController {
     });
 
     if (!(await esquema.isValid(req.body))) {
-      return res.status(400).json({ mensagem: "Campos invalidos" });
+      return res.status(400).json({ mensagem: "invalid fields" });
     }
     const { password } = req.body;
 
-    const musico = await User.findByPk(req.musicoId);
+    const user = await User.findByPk(req.musicoId);
 
-    if (!musico) {
-      return res.status(404).json({ mensagem: "Músico não cadastrado" });
+    if (!user) {
+      return res.status(404).json({ mensagem: "unregistered musician" });
     }
 
-    if (!(await musico.checkPassword(password))) {
-      return res.status(401).json({ mensagem: "password incorreto" });
+    if (!(await user.checkPassword(password))) {
+      return res.status(401).json({ mensagem: "incorrect password" });
     }
 
-    musico.destroy({ where: { id: req.musicoId } });
+    user.destroy({ where: { id: req.musicoId } });
 
-    return res.json({ mensagem: "Músico excluido" });
+    return res.json({ mensagem: "excluded musician" });
+  }
+
+  async joinBand(req, res) {
+    const { band_id } = req.params;
+    const { name, email, password_hash } = req.body;
+
+    const band = await Bands.findByPk(band_id);
+    const user = await User.findOne({where: {email: email}})
+    
+    if(user){
+      return res.status(400).json({mensagem: "registered user"})
+    }
+
+    if(!band){
+      return res.status(400).json({mensagem: "unregistered band"});
+    }
+
+    const userBand = await User.create({
+      name,
+      email,
+      password_hash,
+      band_id,
+    });
+
+    return res.status(200).json(userBand);
+  }
+
+  async updateBandUser(req, res){
+    
   }
 }
 
-module.exports = new MusicoController();
+
+module.exports = new UserController();

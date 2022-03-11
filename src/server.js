@@ -5,4 +5,6 @@ const port = process.env.PORT || 8080;
 
 console.log(process.env.PORT)
 
-app.listen(port);
+app.listen(port, () => {
+    console.log(`http://localhost:${port}`);
+});
